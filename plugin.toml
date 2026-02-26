@@ -1,0 +1,13 @@
+name = "image-compressor"
+version = "0.1.0"
+author = "JohnDotOwl"
+command = "./image-compressor-plugin"
+args = []
+
+[capabilities]
+tools = true
+
+[permissions]
+fs_read = ["{workspace}/**"]
+fs_write = ["{workspace}/**"]
+max_memory_mb = 1024

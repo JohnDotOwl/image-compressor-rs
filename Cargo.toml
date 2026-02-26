@@ -9,10 +9,15 @@ repository = "https://github.com/JohnDotOwl/image-compressor-rs"
 keywords = ["image", "compression", "cli", "optimize", "batch"]
 categories = ["command-line-utilities"]
 
+[[bin]]
+name = "image-compressor-plugin"
+path = "src/plugin.rs"
+
 [dependencies]
 anyhow = "1.0"
 clap = { version = "4.5", features = ["derive"] }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp", "tiff"] }
+serde_json = "1.0"
 walkdir = "2.5"
 mozjpeg = "0.10"
 oxipng = "9"
