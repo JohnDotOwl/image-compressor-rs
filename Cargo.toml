@@ -1,0 +1,22 @@
+[package]
+name = "image-compressor-rs"
+version = "0.1.0"
+edition = "2024"
+description = "Fast Rust CLI + library for image compression using best-in-class encoders"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/JohnDotOwl/image-compressor-rs"
+keywords = ["image", "compression", "cli", "optimize", "batch"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp", "tiff"] }
+walkdir = "2.5"
+mozjpeg = "0.10"
+oxipng = "9"
+webp = "0.3"
+ravif = "0.11"
+rgb = "0.8"
+imgref = "1"
