@@ -90,6 +90,9 @@ enum Commands {
         /// AVIF encoding speed (1=slow/best, 10=fast)
         #[arg(long, value_parser = clap::value_parser!(u8).range(1..=10))]
         avif_speed: Option<u8>,
+        /// Suppress per-file progress output
+        #[arg(long, default_value_t = false)]
+        quiet: bool,
     },
 }
 
@@ -162,6 +165,7 @@ fn run() -> Result<()> {
             overwrite,
             png_level,
             avif_speed,
+            quiet,
         } => {
             let options = build_compress_options(
                 overwrite,
@@ -173,6 +177,7 @@ fn run() -> Result<()> {
                 resize_mode,
                 png_level,
                 avif_speed,
+                quiet,
             )?;
 
             let report = compress_directory(&input_dir, &output_dir, &to, &options, recursive)
@@ -263,6 +268,7 @@ fn build_compress_options(
     resize_mode: ResizeModeArg,
     png_level: Option<u8>,
     avif_speed: Option<u8>,
+    quiet: bool,
 ) -> Result<CompressOptions> {
     let resize = resize
         .map(|value| ResizeOptions::new(value.width, value.height, resize_mode.into()))
@@ -277,5 +283,6 @@ fn build_compress_options(
         resize,
         png_level,
         avif_speed,
+        quiet,
     })
 }

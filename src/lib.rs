@@ -65,6 +65,7 @@ pub struct CompressOptions {
     pub resize: Option<ResizeOptions>,
     pub png_level: Option<u8>,
     pub avif_speed: Option<u8>,
+    pub quiet: bool,
 }
 
 impl Default for CompressOptions {
@@ -78,6 +79,7 @@ impl Default for CompressOptions {
             resize: None,
             png_level: None,
             avif_speed: None,
+            quiet: false,
         }
     }
 }
@@ -210,14 +212,16 @@ pub fn compress_directory(
 
         match compress_image_file(&source_path, &target_path, options) {
             Ok(stats) => {
-                println!(
-                    "compressed {} \u{2192} {} ({} \u{2192} {}, saved {:.1}%)",
-                    source_name,
-                    target_name,
-                    format_size(stats.original_bytes),
-                    format_size(stats.compressed_bytes),
-                    stats.savings_percent,
-                );
+                if !options.quiet {
+                    println!(
+                        "compressed {} \u{2192} {} ({} \u{2192} {}, saved {:.1}%)",
+                        source_name,
+                        target_name,
+                        format_size(stats.original_bytes),
+                        format_size(stats.compressed_bytes),
+                        stats.savings_percent,
+                    );
+                }
                 report.compressed += 1;
                 report.total_original_bytes += stats.original_bytes;
                 report.total_compressed_bytes += stats.compressed_bytes;
