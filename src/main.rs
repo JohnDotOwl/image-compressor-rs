@@ -93,6 +93,9 @@ enum Commands {
         /// Suppress per-file progress output
         #[arg(long, default_value_t = false)]
         quiet: bool,
+        /// Preview compression without writing files
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
     },
 }
 
@@ -166,6 +169,7 @@ fn run() -> Result<()> {
             png_level,
             avif_speed,
             quiet,
+            dry_run,
         } => {
             let options = build_compress_options(
                 overwrite,
@@ -178,6 +182,7 @@ fn run() -> Result<()> {
                 png_level,
                 avif_speed,
                 quiet,
+                dry_run,
             )?;
 
             let report = compress_directory(&input_dir, &output_dir, &to, &options, recursive)
@@ -269,6 +274,7 @@ fn build_compress_options(
     png_level: Option<u8>,
     avif_speed: Option<u8>,
     quiet: bool,
+    dry_run: bool,
 ) -> Result<CompressOptions> {
     let resize = resize
         .map(|value| ResizeOptions::new(value.width, value.height, resize_mode.into()))
@@ -284,5 +290,6 @@ fn build_compress_options(
         png_level,
         avif_speed,
         quiet,
+        dry_run,
     })
 }

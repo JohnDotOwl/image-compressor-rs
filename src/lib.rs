@@ -66,6 +66,7 @@ pub struct CompressOptions {
     pub png_level: Option<u8>,
     pub avif_speed: Option<u8>,
     pub quiet: bool,
+    pub dry_run: bool,
 }
 
 impl Default for CompressOptions {
@@ -80,6 +81,7 @@ impl Default for CompressOptions {
             png_level: None,
             avif_speed: None,
             quiet: false,
+            dry_run: false,
         }
     }
 }
@@ -144,8 +146,10 @@ pub fn compress_image_file(
         }
     };
 
-    fs::write(output, &compressed)
-        .with_context(|| format!("failed to write output file: {}", output.display()))?;
+    if !options.dry_run {
+        fs::write(output, &compressed)
+            .with_context(|| format!("failed to write output file: {}", output.display()))?;
+    }
 
     let compressed_bytes = compressed.len() as u64;
     let savings_percent = if original_bytes > 0 {
@@ -172,12 +176,14 @@ pub fn compress_directory(
         bail!("input directory not found: {}", input_dir.display());
     }
 
-    fs::create_dir_all(output_dir).with_context(|| {
-        format!(
-            "failed to create output directory: {}",
-            output_dir.display()
-        )
-    })?;
+    if !options.dry_run {
+        fs::create_dir_all(output_dir).with_context(|| {
+            format!(
+                "failed to create output directory: {}",
+                output_dir.display()
+            )
+        })?;
+    }
 
     let to_extension = normalize_extension(to_extension)?;
     let files = collect_input_files(input_dir, recursive)?;
@@ -192,11 +198,13 @@ pub fn compress_directory(
         let mut target_path = output_dir.join(relative_path);
         target_path.set_extension(&to_extension);
 
-        if let Some(parent) = target_path.parent() {
-            fs::create_dir_all(parent).ok();
+        if !options.dry_run {
+            if let Some(parent) = target_path.parent() {
+                fs::create_dir_all(parent).ok();
+            }
         }
 
-        if target_path.exists() && !options.overwrite {
+        if !options.dry_run && target_path.exists() && !options.overwrite {
             report.skipped += 1;
             continue;
         }
@@ -212,7 +220,16 @@ pub fn compress_directory(
 
         match compress_image_file(&source_path, &target_path, options) {
             Ok(stats) => {
-                if !options.quiet {
+                if options.dry_run {
+                    println!(
+                        "would compress {} -> {} ({} -> {}, saved {:.1}%)",
+                        source_name,
+                        target_name,
+                        format_size(stats.original_bytes),
+                        format_size(stats.compressed_bytes),
+                        stats.savings_percent,
+                    );
+                } else if !options.quiet {
                     println!(
                         "compressed {} \u{2192} {} ({} \u{2192} {}, saved {:.1}%)",
                         source_name,
@@ -359,7 +376,7 @@ fn validate_input_and_output(input: &Path, output: &Path, options: &CompressOpti
         bail!("input file not found: {}", input.display());
     }
 
-    if output.exists() && !options.overwrite {
+    if !options.dry_run && output.exists() && !options.overwrite {
         bail!(
             "output file exists (use --overwrite to replace): {}",
             output.display()
@@ -490,6 +507,8 @@ mod tests {
         assert!(opts.resize.is_none());
         assert!(opts.png_level.is_none());
         assert!(opts.avif_speed.is_none());
+        assert!(!opts.quiet);
+        assert!(!opts.dry_run);
     }
 
     #[test]
