@@ -36,6 +36,9 @@ enum Commands {
         /// Preserve EXIF/metadata (default: strip)
         #[arg(long, default_value_t = false)]
         keep_metadata: bool,
+        /// Explicitly strip metadata (default: true)
+        #[arg(long, default_value_t = false)]
+        strip_metadata: bool,
         /// Resize dimensions (WIDTHxHEIGHT)
         #[arg(long, value_parser = parse_resize)]
         resize: Option<ResizeInput>,
@@ -117,6 +120,7 @@ fn run() -> Result<()> {
             lossless,
             progressive,
             keep_metadata,
+            strip_metadata,
             resize,
             resize_mode,
             overwrite,
@@ -129,6 +133,7 @@ fn run() -> Result<()> {
                 lossless,
                 progressive,
                 keep_metadata,
+                strip_metadata,
                 resize,
                 resize_mode,
                 png_level,
@@ -269,6 +274,7 @@ fn build_compress_options(
     lossless: bool,
     progressive: bool,
     keep_metadata: bool,
+    strip_metadata: bool,
     resize: Option<ResizeInput>,
     resize_mode: ResizeModeArg,
     png_level: Option<u8>,
@@ -280,12 +286,14 @@ fn build_compress_options(
         .map(|value| ResizeOptions::new(value.width, value.height, resize_mode.into()))
         .transpose()?;
 
+    let final_strip_metadata = if strip_metadata { true } else { !keep_metadata };
+
     Ok(CompressOptions {
         overwrite,
         quality,
         lossless,
         progressive,
-        strip_metadata: !keep_metadata,
+        strip_metadata: final_strip_metadata,
         resize,
         png_level,
         avif_speed,
