@@ -1,6 +1,6 @@
 [package]
 name = "image-compressor-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "Fast Rust CLI + library for image compression using best-in-class encoders"
 license = "MIT"

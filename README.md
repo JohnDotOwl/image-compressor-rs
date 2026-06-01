@@ -77,6 +77,7 @@ image-compressor-rs batch ./icons/ ./icons-opt/ --to png --png-level 4
 | `--lossless` | Lossless mode (WebP, AVIF) | false |
 | `--progressive` | Progressive JPEG | false |
 | `--keep-metadata` | Preserve EXIF/metadata | false (strip) |
+| `--strip-metadata` | Explicitly strip metadata | false |
 | `--resize <WxH>` | Resize dimensions | none |
 | `--resize-mode <fit\|exact>` | Resize strategy | fit |
 | `--overwrite` | Overwrite existing files | false |
@@ -84,6 +85,9 @@ image-compressor-rs batch ./icons/ ./icons-opt/ --to png --png-level 4
 | `--avif-speed <1-10>` | AVIF encoding speed (1=slow/best) | 4 |
 | `--to <FORMAT>` | Target format for batch (jpg/png/webp/avif) | — |
 | `--recursive` | Process subdirectories (batch only) | false |
+| `--verify` | Verify compressed output can be decoded | false |
+| `--dry-run` | Preview batch compression without writing | false |
+| `--quiet` | Suppress per-file progress output | false |
 
 ### Output
 
