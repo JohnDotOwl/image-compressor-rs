@@ -54,6 +54,9 @@ enum Commands {
         /// AVIF encoding speed (1=slow/best, 10=fast)
         #[arg(long, value_parser = clap::value_parser!(u8).range(1..=10))]
         avif_speed: Option<u8>,
+        /// Verify compressed image can be decoded
+        #[arg(long, default_value_t = false)]
+        verify: bool,
     },
     /// Compress all images in a directory
     Batch {
@@ -126,6 +129,7 @@ fn run() -> Result<()> {
             overwrite,
             png_level,
             avif_speed,
+            verify,
         } => {
             let options = build_compress_options(
                 overwrite,
@@ -147,6 +151,13 @@ fn run() -> Result<()> {
                     output.display()
                 )
             })?;
+
+            if verify {
+                image::open(&output).with_context(|| {
+                    format!("verification failed: could not decode {}", output.display())
+                })?;
+                println!("verification passed");
+            }
 
             let input_name = input.file_name().and_then(|n| n.to_str()).unwrap_or("?");
             let output_name = output.file_name().and_then(|n| n.to_str()).unwrap_or("?");
